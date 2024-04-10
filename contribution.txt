@@ -1,1 +1,29 @@
 Contributions file for SER 502 Project - Team 15
+
+Rahul Manoj
+- Achieved
+  - Writing grammar rules
+- Plan
+  - Writing grammar for ANTLR
+  - Writing python interpreter code
+
+Harshit Singh
+- Achieved
+  - Writing grammar rules
+- Plan
+  - Writing grammar for ANTLR
+  - Writing python interpreter code
+
+Arvind Anand
+- Achieved
+  - Writing grammar rules
+- Plan
+  - Writing grammar for ANTLR
+  - Writing python interpreter code
+
+Akash Vijayasarathy
+- Achieved
+  - Writing grammar rules
+- Plan
+  - Writing grammar for ANTLR
+  - Writing python interpreter code
