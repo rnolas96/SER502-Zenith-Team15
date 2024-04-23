@@ -1,5 +1,79 @@
 grammar ZenithGrammar;
 
+// --assignments
+assignment_expr
+	: VARIABLE_IDENTIFIER ASSIGNMENT_OPERATOR num_expr                       # integerAssignment
+	| VARIABLE_IDENTIFIER ASSIGNMENT_OPERATOR bool_expr                      # booleanAssignment
+    | VARIABLE_IDENTIFIER ASSIGNMENT_OPERATOR ternary_expr                   # ternaryAssignment
+    ;
+
+// --expressions
+exprs
+    : num_expr
+    | bool_expr
+    ;
+
+// --boolean expressions
+bool_expr
+    : bool_expr op=(AND|OR|IS_EQUL_TO|NOT_EQUL_TO) bool_expr  # booleanLogicalExpression
+    | comp_expr                                               # booleanComparisonExpression
+    | '(' bool_expr ')'                                       # booleanExpressionInBrackets
+    | BOOLEAN										          # primitiveBooleanValuesOnly
+    | VARIABLE_IDENTIFIER										      # booleanIdentifierOnlyExpression
+    ;
+
+// --comparison expressions
+comp_expr
+    : num_expr op=(GREATER_THAN|LESS_THAN|MORE_THAN_OR_EQUL|LESS_THAN_OR_EQUL|IS_EQUL_TO|NOT_EQUL_TO) num_expr  # numberComparisonExpression
+    ;
+
+// --arithmetic expressions
+num_expr
+    : VARIABLE_IDENTIFIER ASSIGNMENT_OPERATOR num_expr
+    | add_sub_expr
+    ;
+
+// --add and sub expressions
+add_sub_expr
+    : add_sub_expr (ADD|SUB) term_expr
+    | term_expr
+    ;
+
+// --term expressions
+term_expr
+    : term_expr (MUL|DIV) bracket_expr
+    | bracket_expr 
+    ;
+
+// --bracket expressions
+bracket_expr
+    : '(' num_expr ')' 
+    | DIGITS
+    | DECIMAL_VALUE
+    | VARIABLE_IDENTIFIER
+    ;
+
+// Conditional and Looping Constructs
+// --conditional expression
+cond_expr
+    : '(' bool_expr ')'
+    ;
+
+// --if expression
+if_expr
+    : 'if' cond_expr block (else_if_expr)* (else_expr)?
+    ;
+
+// --else if (condition) expression
+else_if_expr
+    : 'elseIf' cond_expr block
+    ;
+
+// --else expression
+else_expr
+    : 'else' block
+    ;
+
 // --while(condition) expression
 while_expr
     : 'while' cond_expr block
