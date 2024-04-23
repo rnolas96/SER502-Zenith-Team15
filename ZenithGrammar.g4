@@ -1,5 +1,53 @@
 grammar ZenithGrammar;
 
+// --while(condition) expression
+while_expr
+    : 'while' cond_expr block
+    ;
+
+// --for enhanced
+for_enhanced
+    : 'for' VARIABLE_IDENTIFIER 'in' 'range' '(' rangeVal '..' rangeVal ')' block
+    ;
+
+rangeVal
+	: VARIABLE_IDENTIFIER
+	| DIGITS
+	;
+
+// --for normal
+for_loop
+    : 'for' '(' (declaration|assignment_expr) ';' bool_expr ';' variable_change_part ')' block
+    ;
+
+variable_change_part : increment_expression
+                        | decrement_expression
+                        |VARIABLE_IDENTIFIER ASSIGNMENT_OPERATOR num_expr;
+
+decrement_expression : VARIABLE_IDENTIFIER '--'
+                       | '--' VARIABLE_IDENTIFIER;
+
+
+increment_expression : VARIABLE_IDENTIFIER '++'
+                       | '++' VARIABLE_IDENTIFIER;
+
+
+//Other Elements and Miscellaneous
+ternary_expr
+    : cond_expr '?' exprs ':' exprs
+    | cond_expr '?' BOOLEAN ':' BOOLEAN
+    | cond_expr '?' VALID_STRING ':' VALID_STRING
+    ;
+
+// all types of values
+value
+    : DIGITS
+    | BOOLEAN
+    | VARIABLE_IDENTIFIER
+    | num_expr
+    | bool_expr
+    | VALID_STRING
+    ;
 
 // --print statement
 print
