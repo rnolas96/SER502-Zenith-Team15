@@ -1,4 +1,42 @@
 grammar ZenithGrammar;
+//Program Structure and Blocks
+// --program
+program
+	: 'start' block 'end'
+	;
+
+// --block
+block
+    : '{' atomic_block+ '}' 
+    | '{'  '}'
+    ;
+
+// -- atomic block
+atomic_block
+	:  command+ 
+    |  declaration+ 
+	;
+
+// -- declaration
+declaration
+    : 'int' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR num_expr)?              # integerDeclaration
+	| 'int' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?          # integerDeclaration
+	| 'boolean' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR bool_expr)?         # booleanDeclaration
+	| 'boolean' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?      # booleanDeclaration
+	| 'string' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR VALID_STRING)?       # stringDeclaration
+	| 'string' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?       # stringDeclaration
+    | 'float' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR DECIMAL_VALUE)?       # floatDeclaration
+    | 'float' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?        # floatDeclaration
+    | 'double' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR DECIMAL_VALUE)?      # doubleDeclaration
+    | 'double' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?       # doubleDeclaration
+    | '{}'                                                # emptyDeclaration
+    ;
+
+//Commands and Expressions
+// --commands
+command
+	: (if_expr|while_expr|for_enhanced|for_loop|print|assignment_expr)
+	;
 
 // --assignments
 assignment_expr
