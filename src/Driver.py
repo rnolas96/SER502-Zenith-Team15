@@ -1,10 +1,11 @@
 from antlr4 import *
-from ZenithGrammarLexer import ZenithGrammarLexer
-from ZenithGrammarParser import ZenithGrammarParser
-from ZenithGrammarListener import ZenithGrammarListener
+from grammar.ZenithGrammarLexer import ZenithGrammarLexer
+from grammar.ZenithGrammarParser import ZenithGrammarParser
+from grammar.ZenithGrammarListener import ZenithGrammarListener
 from antlr4 import ParseTreeWalker
 
-from Runtime import Runtime
+from src.Runtime import Runtime
+
 
 def export_parse_tree_to_dot(parser, tree, output_file):
     def traverse(node, node_id):

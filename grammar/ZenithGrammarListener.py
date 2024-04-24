@@ -1,6 +1,8 @@
 # Generated from ZenithGrammar.g4 by ANTLR 4.13.0
 import sys
 from antlr4 import *
+from src.IntermediateCode import IntermediateCode
+
 if "." in __name__:
     from .ZenithGrammarParser import ZenithGrammarParser
 else:
@@ -56,10 +58,10 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#integerDeclaration.
     def enterIntegerDeclaration(self, ctx:ZenithGrammarParser.IntegerDeclarationContext):
-        var_name = ctx.IDENTIFIER().getText()
+        var_name = ctx.VARIABLE_IDENTIFIER().getText()
         self.add_variable_to_list(var_name)
         declaration_code = f"{var_name}"
-        if ctx.EQUALS_TO():
+        if ctx.ASSIGNMENT_OPERATOR():
             value = ctx.num_expr().getText()
             declaration_code += f" = {value}"
         else:
