@@ -1,4 +1,5 @@
 # Generated from ZenithGrammar.g4 by ANTLR 4.13.0
+import sys
 from antlr4 import *
 if "." in __name__:
     from .ZenithGrammarParser import ZenithGrammarParser
@@ -7,6 +8,24 @@ else:
 
 # This class defines a complete listener for a parse tree produced by ZenithGrammarParser.
 class ZenithGrammarListener(ParseTreeListener):
+    def __init__(self):
+        self.intermediate_code = IntermediateCode()
+        self.variable_list = []
+
+    def get_output(self):
+        return self.intermediate_code.get_intermediate_code()
+
+    def add_variable_to_list(self, named_variable):
+        self.variable_list.append(named_variable)
+
+    def does_variable_exist(self, named_variable):
+        return named_variable in self.variable_list
+
+    def missing_variable_error(self, identifier):
+        print(
+            f"Compiletime error: Variable {identifier} not defined. Did you forget to declare variable {identifier}?",
+            file=sys.stderr)
+        sys.exit(1)
 
     # Enter a parse tree produced by ZenithGrammarParser#program.
     def enterProgram(self, ctx:ZenithGrammarParser.ProgramContext):
@@ -37,7 +56,16 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#integerDeclaration.
     def enterIntegerDeclaration(self, ctx:ZenithGrammarParser.IntegerDeclarationContext):
-        pass
+        var_name = ctx.IDENTIFIER().getText()
+        self.add_variable_to_list(var_name)
+        declaration_code = f"{var_name}"
+        if ctx.EQUALS_TO():
+            value = ctx.num_expr().getText()
+            declaration_code += f" = {value}"
+        else:
+            declaration_code += ""
+        self.intermediate_code.add_intermediate_output(declaration_code)
+
 
     # Exit a parse tree produced by ZenithGrammarParser#integerDeclaration.
     def exitIntegerDeclaration(self, ctx:ZenithGrammarParser.IntegerDeclarationContext):
@@ -91,6 +119,8 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#command.
     def enterCommand(self, ctx:ZenithGrammarParser.CommandContext):
+        command = ctx.getText()
+        self.intermediate_code.add_instruction(command)
         pass
 
     # Exit a parse tree produced by ZenithGrammarParser#command.
