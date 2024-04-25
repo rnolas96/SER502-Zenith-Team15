@@ -1,7 +1,7 @@
 # Generated from ZenithGrammar.g4 by ANTLR 4.13.0
 import sys
 from antlr4 import *
-from src.IntermediateCode import IntermediateCode
+from IntermediateCode import IntermediateCode
 
 if "." in __name__:
     from .ZenithGrammarParser import ZenithGrammarParser
