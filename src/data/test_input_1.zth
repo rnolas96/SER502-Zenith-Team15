@@ -1,0 +1,9 @@
+start
+{
+    string s = "Hello"
+    int a = 10
+    boolean b = True
+    float f = 5.0
+    double d = 2.3
+}
+end

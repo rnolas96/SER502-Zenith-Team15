@@ -1,11 +1,17 @@
+import sys
+
 from antlr4 import *
-from grammar.ZenithGrammarLexer import ZenithGrammarLexer
-from grammar.ZenithGrammarParser import ZenithGrammarParser
-from grammar.ZenithGrammarListener import ZenithGrammarListener
+
+from compiler.ZenithGrammarListener import ZenithGrammarListener
+from compiler.ZenithGrammarLexer import ZenithGrammarLexer
+from compiler.ZenithGrammarParser import ZenithGrammarParser
+
+from Runtime import Runtime
+
 from antlr4 import ParseTreeWalker
 
-from src.Runtime import Runtime
-
+sys.path.append("C:/Users/Rahul Manoj/Documents/ASU Documents/LAPP/SER502-Zenith-Team15/src")
+print(sys.path)
 
 def export_parse_tree_to_dot(parser, tree, output_file):
     def traverse(node, node_id):
@@ -30,13 +36,14 @@ def export_parse_tree_to_dot(parser, tree, output_file):
     with open(output_file, "w") as f:
         f.write(dot_content)
 
+
 def main():
     # Parse input
 
-    file_path = "test_input_1.zth"
+    file_path = "data/test_input_1.zth"
 
     with open(file_path, 'r') as file:
-    # Create a CharStream from the file
+        # Create a CharStream from the file
         lexinalCode = InputStream(file.read())
 
         # Create lexer and parser objects
@@ -48,7 +55,7 @@ def main():
         tree = parser.program()
 
         # Export parse tree as DOT file
-        output_file = "parse_tree.dot"
+        output_file = "../parse_tree.dot"
         export_parse_tree_to_dot(parser, tree, output_file)
 
         print("Parse tree DOT file generated successfully:", output_file)
@@ -66,7 +73,7 @@ def main():
                 for line in intermediate_code:
                     f.write(line + "\n")
 
-        runtime = Runtime()
+        runtime = Runtime.Runtime()
 
         # Execute the intermediate code
         runtime.execute(intermediate_code)
