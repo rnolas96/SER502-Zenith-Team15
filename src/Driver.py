@@ -10,8 +10,6 @@ from Runtime import Runtime
 
 from antlr4 import ParseTreeWalker
 
-sys.path.append("C:/Users/Rahul Manoj/Documents/ASU Documents/LAPP/SER502-Zenith-Team15/src")
-print(sys.path)
 
 def export_parse_tree_to_dot(parser, tree, output_file):
     def traverse(node, node_id):
