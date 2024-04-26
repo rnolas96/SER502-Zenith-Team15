@@ -15,6 +15,7 @@ class ZenithGrammarListener(ParseTreeListener):
     def __init__(self):
         self.intermediate_code = IntermediateCode()
         self.variable_list = []
+        self.type_list = {}
 
     def get_output(self):
         return self.intermediate_code.get_intermediate_code()
@@ -22,15 +23,11 @@ class ZenithGrammarListener(ParseTreeListener):
     def add_variable_to_list(self, named_variable):
         self.variable_list.append(named_variable)
 
+    def add_variable_type_to_list(self, type):
+        self.type_list.update(type)
+
     def does_variable_exist(self, named_variable):
         return named_variable in self.variable_list
-
-    def update_variable_in_list(self, named_variable, value):
-        for variable in self.variable_list:
-            if variable["value"] == named_variable:
-                variable['value'] = value
-                return
-        self.missing_variable_error(named_variable)
 
     def missing_variable_error(self, identifier):
         print(
@@ -66,6 +63,7 @@ class ZenithGrammarListener(ParseTreeListener):
     def enterIntegerDeclaration(self, ctx: ZenithGrammarParser.IntegerDeclarationContext):
         var_name = ctx.VARIABLE_IDENTIFIER().getText()
         self.add_variable_to_list(var_name)
+        self.add_variable_type_to_list({var_name: 'int'})
         declaration_code = f"{var_name}"
         if ctx.ASSIGNMENT_OPERATOR():
             value = ctx.num_expr().getText()
@@ -82,6 +80,7 @@ class ZenithGrammarListener(ParseTreeListener):
     def enterBooleanDeclaration(self, ctx: ZenithGrammarParser.BooleanDeclarationContext):
         variable_name = ctx.VARIABLE_IDENTIFIER().getText()
         self.add_variable_to_list(variable_name)
+        self.add_variable_type_to_list({variable_name: 'boolean'})
         value = None
         if ctx.bool_expr():
             value = ctx.bool_expr().getText()
@@ -103,6 +102,7 @@ class ZenithGrammarListener(ParseTreeListener):
     def enterStringDeclaration(self, ctx: ZenithGrammarParser.StringDeclarationContext):
         variable_name = ctx.VARIABLE_IDENTIFIER().getText()
         self.add_variable_to_list(variable_name)
+        self.add_variable_type_to_list({variable_name:'string'})
         value = None
         if ctx.VALID_STRING():
             value = ctx.VALID_STRING().getText()
@@ -124,6 +124,7 @@ class ZenithGrammarListener(ParseTreeListener):
     def enterFloatDeclaration(self, ctx: ZenithGrammarParser.FloatDeclarationContext):
         variable_name = ctx.VARIABLE_IDENTIFIER().getText()
         self.add_variable_to_list(variable_name)
+        self.add_variable_type_to_list({variable_name:'float'})
         value = None
         if ctx.DECIMAL_VALUE():
             value = ctx.DECIMAL_VALUE().getText()
@@ -145,6 +146,7 @@ class ZenithGrammarListener(ParseTreeListener):
     def enterDoubleDeclaration(self, ctx: ZenithGrammarParser.DoubleDeclarationContext):
         variable_name = ctx.VARIABLE_IDENTIFIER().getText()
         self.add_variable_to_list(variable_name)
+        self.add_variable_type_to_list({variable_name:'double'})
         value = None
         if ctx.DECIMAL_VALUE():
             value = ctx.DECIMAL_VALUE().getText()
@@ -173,8 +175,6 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#command.
     def enterCommand(self, ctx: ZenithGrammarParser.CommandContext):
-        command = ctx.getText()
-        self.intermediate_code.add_intermediate_output(command)
         pass
 
     # Exit a parse tree produced by ZenithGrammarParser#command.
@@ -184,16 +184,18 @@ class ZenithGrammarListener(ParseTreeListener):
     # Enter a parse tree produced by ZenithGrammarParser#integerAssignment.
     def enterIntegerAssignment(self, ctx: ZenithGrammarParser.IntegerAssignmentContext):
         variable_name = ctx.VARIABLE_IDENTIFIER().getText()
-        value = ctx.num_expr().getText()
-        self.update_variable_in_list(variable_name, value)
+        check = self.does_variable_exist(variable_name)
+        declaration_code = f" {variable_name}"
 
-        # Add the integer assignment to the intermediate code
-        # assignment_code = f"{variable_name}"
-        # if value:
-        #     assignment_code += f" = {value}"
-        # self.intermediate_code.add_intermediate_output(assignment_code)
-        pass
-
+        if check:
+            if self.type_list[variable_name] == 'int':
+                if ctx.num_expr():
+                    value = self.enterNum_expr(ctx.num_expr())
+                    declaration_code += f" = {value}"
+                    self.intermediate_code.add_intermediate_output(declaration_code)
+                    # print("comes to integer assignment", declaration_code)
+                    # print("comes to integer assignment", ctx.num_expr().getText())
+            
     # Exit a parse tree produced by ZenithGrammarParser#integerAssignment.
     def exitIntegerAssignment(self, ctx: ZenithGrammarParser.IntegerAssignmentContext):
         pass
@@ -272,7 +274,23 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#num_expr.
     def enterNum_expr(self, ctx: ZenithGrammarParser.Num_exprContext):
-        pass
+        # print("comes to number expression", ctx.getText(), ctx.getChildCount())
+
+        if ctx.VARIABLE_IDENTIFIER():
+            variable_name = ctx.VARIABLE_IDENTIFIER().getText()
+            # print(variable_name)
+            check = self.does_variable_exist(variable_name)
+            if check:
+                if self.type_list[variable_name] != 'boolean' and self.type_list[variable_name] != 'string':
+                    declaration_code = f" {variable_name}"
+                    if ctx.num_expr():
+                        value = self.enterNum_expr(ctx.num_expr())
+                        declaration_code += f" = {value}"
+                        # print("enterNum declaration - ", declaration_code)
+                        return declaration_code
+                        # self.intermediate_code.add_intermediate_output(declaration_code)
+        else:
+            return self.enterAdd_sub_expr(ctx.add_sub_expr())
 
     # Exit a parse tree produced by ZenithGrammarParser#num_expr.
     def exitNum_expr(self, ctx: ZenithGrammarParser.Num_exprContext):
@@ -280,7 +298,26 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#add_sub_expr.
     def enterAdd_sub_expr(self, ctx: ZenithGrammarParser.Add_sub_exprContext):
-        pass
+        # print("comes to add expression", ctx.getText(), ctx.getChildCount())  
+        # print("comes to multiple children check", ctx.getText(), ctx.getChildCount())  
+        if ctx.ADD():
+            # print("comes to add specific")
+            value1 = self.enterAdd_sub_expr(ctx.add_sub_expr())
+            value2 = self.enterTerm_expr(ctx.term_expr())
+            declaration_code = f" {value1}"
+            declaration_code += f" + {value2}"
+            return declaration_code
+        
+        elif ctx.SUB():
+            value1 = self.enterAdd_sub_expr(ctx.add_sub_expr())
+            value2 = self.enterTerm_expr(ctx.term_expr())
+            declaration_code = f" {value1}"
+            declaration_code += f" - {value2}"
+            return declaration_code
+
+        else:
+            return self.enterTerm_expr(ctx.term_expr())
+        
 
     # Exit a parse tree produced by ZenithGrammarParser#add_sub_expr.
     def exitAdd_sub_expr(self, ctx: ZenithGrammarParser.Add_sub_exprContext):
@@ -288,7 +325,25 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#term_expr.
     def enterTerm_expr(self, ctx: ZenithGrammarParser.Term_exprContext):
-        pass
+        # print("comes to mult expression", ctx.getText(),  ctx.getChildCount())  
+
+        if ctx.MUL():
+            # print("comes to mult specific")
+            value1 = self.enterTerm_expr(ctx.term_expr())
+            value2 = self.enterBracket_expr(ctx.bracket_expr())
+            declaration_code = f" {value1}"
+            declaration_code += f" * {value2}"
+            return declaration_code
+        
+        elif ctx.DIV():
+            value1 = self.enterTerm_expr(ctx.term_expr())
+            value2 = self.enterBracket_expr(ctx.bracket_expr())
+            declaration_code = f" {value1}"
+            declaration_code += f" / {value2}"
+            return declaration_code
+
+        else:
+            return self.enterBracket_expr(ctx.bracket_expr())
 
     # Exit a parse tree produced by ZenithGrammarParser#term_expr.
     def exitTerm_expr(self, ctx: ZenithGrammarParser.Term_exprContext):
@@ -296,7 +351,22 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#bracket_expr.
     def enterBracket_expr(self, ctx: ZenithGrammarParser.Bracket_exprContext):
-        pass
+        # print("bracket expr", ctx.getText())
+        if ctx.num_expr():  
+            # print("num_expr", ctx.num_expr().getText())  
+            return '(' + self.enterNum_expr(ctx.num_expr()) + ' )'
+        
+        elif ctx.DIGITS():
+            # print("digits", ctx.DIGITS().getText()) 
+            return ctx.DIGITS().getText()
+        
+        elif ctx.DECIMAL_VALUE():
+            # print("decimal value", ctx.DECIMAL_VALUE().getText()) 
+            return ctx.DECIMAL_VALUE().getText()
+        
+        elif ctx.VARIABLE_IDENTIFIER():
+            # print("variable identifier", ctx.VARIABLE_IDENTIFIER().getText()) 
+            return ctx.VARIABLE_IDENTIFIER().getText()
 
     # Exit a parse tree produced by ZenithGrammarParser#bracket_expr.
     def exitBracket_expr(self, ctx: ZenithGrammarParser.Bracket_exprContext):
