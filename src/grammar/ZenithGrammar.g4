@@ -25,9 +25,9 @@ declaration
 	| 'boolean' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?      # booleanDeclaration
 	| 'string' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR VALID_STRING)?       # stringDeclaration
 	| 'string' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?       # stringDeclaration
-    | 'float' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR DECIMAL_VALUE)?       # floatDeclaration
+    | 'float' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR num_expr)?       # floatDeclaration
     | 'float' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?        # floatDeclaration
-    | 'double' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR DECIMAL_VALUE)?      # doubleDeclaration
+    | 'double' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR num_expr)?      # doubleDeclaration
     | 'double' VARIABLE_IDENTIFIER (ASSIGNMENT_OPERATOR ternary_expr)?       # doubleDeclaration
     | '{}'                                                # emptyDeclaration
     ;
@@ -53,11 +53,21 @@ exprs
 
 // --boolean expressions
 bool_expr
-    : bool_expr op=(AND|OR|IS_EQUL_TO|NOT_EQUL_TO) bool_expr  # booleanLogicalExpression
-    | comp_expr                                               # booleanComparisonExpression
-    | '(' bool_expr ')'                                       # booleanExpressionInBrackets
-    | BOOLEAN										          # primitiveBooleanValuesOnly
-    | VARIABLE_IDENTIFIER										      # booleanIdentifierOnlyExpression
+    : VARIABLE_IDENTIFIER ASSIGNMENT_OPERATOR bool_expr      
+    | bool_computation_expr                                  
+    ;
+
+// --bool computation
+bool_computation_expr
+    : bool_computation_expr op=(AND|OR|IS_EQUL_TO|NOT_EQUL_TO) bool_computation_expr  
+    | comp_expr                                 
+    | bool_bracket_expr
+    ;
+
+bool_bracket_expr
+    : '(' bool_expr ')'
+    | BOOLEAN										          
+    | VARIABLE_IDENTIFIER										      
     ;
 
 // --comparison expressions

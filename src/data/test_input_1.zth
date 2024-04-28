@@ -1,10 +1,66 @@
 start
 {
-    string s = "Hello"
-    int a = 10
-    boolean b = True
-    float f = 5.0
-    double d = 2.3
-    a = a = a = ((a - 3) * (5 + 7)) + ( (a + 5) * (5 + 6) ) + ( 7 * 6 ) * (3 - 4)
+   string s = "Hello"
+   int a = 10
+   int c = 1
+   boolean b  # default value is True
+   float f = 5.0
+   double d = 2.3
+   b = ( ( true or b ) and ( b and true ) not ( 6 == b + 4 ) )
+   a = a = a = ((a - 3) * (5 + 7)) + ( (a + 5) * (5 + 6) ) + ( 7 * 6 ) * (3 - 4)
+   a = a + 4
+   if (a == 207)
+   {
+      a = 511
+      c = 21
+      if (a == 513)
+      {
+         a = 51
+         c = 1
+         c = 21
+         if (a == 514)
+         {
+            a = 51
+            c = 1
+            c = 21
+         }
+      }
+      else 
+      {
+         a = 17
+      }
+      c = 10
+      if (a == 511)
+      {
+         a = 123
+         c = 1
+         c = 21
+         c = 21
+         c = 21
+         a = 129
+         c = 1
+         c = 21
+         c = 21
+         c = 21
+         a = a + 4
+      }
+      if (a == 516)
+      {
+         a = 51
+         c = 1
+      }
+   }
+   elseIf (a == 211)
+   {
+      c = 111
+   }
+   elseIf (a == 215)
+   {
+      c = 115
+   }
+   else
+   {
+      c = 119
+   }
 }
 end
