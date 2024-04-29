@@ -4,26 +4,22 @@ Rahul Manoj
 - Achieved
   - Writing grammar rules
   - Writing grammar for ANTLR
-- Plan
   - Writing python Listener code
 
 Harshit Singh
 - Achieved
   - Writing grammar rules
   - Writing grammar for ANTLR
-- Plan
   - Writing python Listener code
 
 Arvind Anand
 - Achieved
   - Writing grammar rules
   - Writing grammar for ANTLR
-- Plan
   - Writing python Listener code
 
 Akash Vijayasarathy
 - Achieved
   - Writing grammar rules
   - Writing grammar for ANTLR
-- Plan
   - Writing python Listener code
