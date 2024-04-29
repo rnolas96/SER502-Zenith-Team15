@@ -96,9 +96,9 @@ term_expr
 // --bracket expressions
 bracket_expr
     : '(' num_expr ')' 
-    | DIGITS
-    | DECIMAL_VALUE
-    | VARIABLE_IDENTIFIER
+    | SUB? DIGITS
+    | SUB? DECIMAL_VALUE
+    | SUB? VARIABLE_IDENTIFIER
     ;
 
 // Conditional and Looping Constructs
@@ -139,7 +139,7 @@ rangeVal
 
 // --for normal
 for_loop
-    : 'for' '(' (declaration|assignment_expr) ';' bool_expr ';' variable_change_part ')' block
+    : 'for' '(' VARIABLE_IDENTIFIER '$=' DIGITS ';' bool_expr ';' variable_change_part ')' block
     ;
 
 variable_change_part : increment_expression
