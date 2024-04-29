@@ -5,26 +5,31 @@ Rahul Manoj
   - Writing grammar rules
   - Writing grammar for ANTLR
   - Writing python Listener code
-  - Writing pythong Runner file
+  - Writing python Runner file
+  - Writing presentation 
 
 Harshit Singh
 - Achieved
   - Writing grammar rules
   - Writing grammar for ANTLR
   - Writing python Listener code
-  - Writing pythong Runner file
+  - Writing python Runner file
+  - Writing presentation 
 
 Arvind Anand
 - Achieved
   - Writing grammar rules
   - Writing grammar for ANTLR
   - Writing python Listener code
-  - Writing pythong Runner file
+  - Writing python Runner file
+  - Writing presentation 
 
 Akash Vijayasarathy
 - Achieved
   - Writing grammar rules
   - Writing grammar for ANTLR
   - Writing python Listener code
-  - Writing pythong Runner file
+  - Writing python Runner file
+  - Writing presentation 
+
 
