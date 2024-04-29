@@ -1,0 +1,9 @@
+start
+{
+    int a
+    boolean b 
+    b = ( ( true or b ) and ( b and true ) not ( 6 == b + 4 ) )
+    a = ((a - 3) * (5 + 7)) + ( (a + 5) * (5 + 6) ) + ( 7 * 6 ) * (3 - 4)
+    print(a,b)
+}
+end

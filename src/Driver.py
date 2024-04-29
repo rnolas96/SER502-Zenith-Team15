@@ -1,4 +1,5 @@
 import sys
+import argparse
 
 from antlr4 import *
 
@@ -38,7 +39,12 @@ def export_parse_tree_to_dot(parser, tree, output_file):
 def main():
     # Parse input
 
-    file_path = "data/test_input_1.zth"
+    parser = argparse.ArgumentParser(description="Process a Zenith file.")
+    parser.add_argument('file_path', type=str, help="The path to the Zenith file to process.")
+    args = parser.parse_args()
+
+    # Use the file path from the command line arguments
+    file_path = args.file_path
 
     with open(file_path, 'r') as file:
         # Create a CharStream from the file
@@ -62,10 +68,11 @@ def main():
 
         walker = ParseTreeWalker()
         walker.walk(listener, tree)
-        print(tree)
+        # print(tree)
 
         intermediate_code = listener.get_output()
-        print("Compile time: No of lines in intermediate code -", intermediate_code)
+        print("Compile time: No of lines in intermediate code -", len(intermediate_code.split("\n")))
+        print("Intermediate code:", intermediate_code)
         if len(intermediate_code) >= 1:
             with open(file_path.replace("zth", "izth"), "w", encoding="utf-8") as f:
                 for line in intermediate_code:

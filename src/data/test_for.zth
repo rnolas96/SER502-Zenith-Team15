@@ -1,0 +1,9 @@
+start
+{
+    int c
+    for (c$=1;c<4;c++)
+    {
+        print("Hello")
+    }
+}
+end

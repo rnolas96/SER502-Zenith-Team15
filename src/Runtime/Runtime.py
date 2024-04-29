@@ -14,7 +14,7 @@ class Runtime:
         while i < len(lines):
 
             # print(len(lines[i]))
-            print("regular", i, " - ", lines[i])
+            # print("regular", i, " - ", lines[i])
 
             if lines[i] == '{':
                 indent += 1
@@ -22,7 +22,7 @@ class Runtime:
                 continue
 
             elif lines[i] == '}':
-                print("indent decrement- ", indent, "and", i)
+                # print("indent decrement- ", indent, "and", i)
                 indent -= 1
                 i += 1
                 continue
@@ -56,6 +56,7 @@ class Runtime:
                     i += 1
 
                     while i < len(lines) and (lines[i] == '{' or lines[i] == '}'):
+                        # print("comes here")
                         i+=1
 
                     if i < len(lines):
@@ -76,7 +77,7 @@ class Runtime:
 
                         spaceCountElif = len(lines[i]) - len(lines[i].lstrip())
                         
-                        print("spaceCountElif - ", spaceCountElif, lines[i])
+                        # print("spaceCountElif - ", spaceCountElif, lines[i])
 
                         while i < len(lines) and (spaceCountElif - spaceCount) > 0:
                             combined_code += "\n" + lines[i]
@@ -107,13 +108,13 @@ class Runtime:
                             if i < len(lines):
                                 spaceCountElse = len(lines[i]) - len(lines[i].lstrip())
                 
-                print("combined code", combined_code)
+                # print("combined code", combined_code)
                 exec(combined_code, {}, self.variables)
                 combined_code = ""
             else:
                 exec(lines[i], {}, self.variables)
+                i += 1
 
-            i += 1
 
 
 

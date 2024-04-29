@@ -1,0 +1,26 @@
+start
+{
+    #Prime Numbers
+
+    int count
+    int n = 18
+    int i
+    int d
+    for(i$=2; i<n; i++)
+    {
+        d = n/i
+        if((n-(d)*i) == 0)
+        {
+            count = count + 1
+        }
+    }
+    if (count==0)
+    {
+        print("Prime")
+    }
+    else
+    {
+        print("Nonprime")
+    }
+}
+end

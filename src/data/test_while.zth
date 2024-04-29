@@ -1,0 +1,11 @@
+start
+{
+    int a = 10
+    int b = 1
+    while (a > 0)
+    {
+        b = b + 1
+        a = a - 1
+    }
+}
+end

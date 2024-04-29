@@ -1,0 +1,10 @@
+start
+{
+    int a = 5
+    int b #Default Value = 0
+    boolean c #Default Value = True
+    string d = "ZenithGrammar"
+    float e = 3.55897090
+    double f = 4.56678567
+}
+end

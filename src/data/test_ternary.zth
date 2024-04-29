@@ -1,0 +1,6 @@
+start
+{
+    int a = (2 > 1) ? 5 : 10
+    string s = (100 < 231) ? "Allowed" : "Denied"
+}
+end

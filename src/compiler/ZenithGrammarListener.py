@@ -20,7 +20,7 @@ class ZenithGrammarListener(ParseTreeListener):
         self.indent_list = []
 
     def indentOpp(self):
-        print("listop regular", self.indent_list)
+        # print("listop regular", self.indent_list)
         if len(self.indent_list) > 0:
             last_element = self.indent_list.pop()
             last_element -= 1
@@ -37,7 +37,7 @@ class ZenithGrammarListener(ParseTreeListener):
                     self.indent_list.append(current)
 
     def indentOppCond(self):
-        print("listop cond", self.indent_list)
+        # print("listop cond", self.indent_list)
         if len(self.indent_list) > 0:
             last_element = self.indent_list.pop()
             if last_element > 0:
@@ -109,9 +109,11 @@ class ZenithGrammarListener(ParseTreeListener):
             declaration_code += ""
        
         if value:
-            declaration_code += f" = {value}"
+            int_value = f"int({value})"
+            declaration_code += f" = {int_value}"
         elif not ctx.ternary_expr() :
             declaration_code += f" = 0"
+        # print("value from integer declaration",declaration_code)
         self.intermediate_code.add_intermediate_output(declaration_code)
         self.indentOpp()
 
@@ -129,7 +131,7 @@ class ZenithGrammarListener(ParseTreeListener):
         if ctx.bool_expr():
             value = ctx.bool_expr().getText()
         elif ctx.ternary_expr():
-            value = ctx.ternary_expr().getText()
+            value = self.enterTernary_expr(ctx.ternary_expr())
         # Add the boolean declaration to the intermediate code
         if value:
             declaration_code += f" = {value}"
@@ -153,7 +155,7 @@ class ZenithGrammarListener(ParseTreeListener):
         if ctx.VALID_STRING():
             value = ctx.VALID_STRING().getText()
         elif ctx.ternary_expr():
-            value = ctx.ternary_expr().getText()
+            value = self.enterTernary_expr(ctx.ternary_expr())
         else:
             declaration_code += ""
 
@@ -187,7 +189,8 @@ class ZenithGrammarListener(ParseTreeListener):
 
         # Add the float declaration to the intermediate code
         if value:
-            declaration_code += f" = {value}"
+            float_value = f"{round(float(value), 4)}"
+            declaration_code += f" = {float_value}"
         else:
             declaration_code += f" = 0.0"
         self.intermediate_code.add_intermediate_output(declaration_code)
@@ -248,6 +251,7 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#integerAssignment.
     def enterIntegerAssignment(self, ctx: ZenithGrammarParser.IntegerAssignmentContext):
+        # print("Comes to the integer assignment")
         variable_name = ctx.VARIABLE_IDENTIFIER().getText()
         check = self.does_variable_exist(variable_name)
         declaration_code = f"{variable_name}"
@@ -256,7 +260,12 @@ class ZenithGrammarListener(ParseTreeListener):
             if self.type_list[variable_name] == 'int' or self.type_list[variable_name] == 'float' or self.type_list[variable_name] == 'double':
                 if ctx.num_expr():
                     value = self.enterNum_expr(ctx.num_expr())
-                    declaration_code += f" = {value}"
+                    if self.type_list[variable_name] == 'int':
+                        int_value = f"int({value})"
+                        declaration_code += f" = {int_value}"
+                    else:
+                        declaration_code += f" = {value}"
+                    # print("comes to integer assignment", declaration_code)
                     self.intermediate_code.add_intermediate_output(declaration_code)
                     self.indentOpp()
 
@@ -269,13 +278,13 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#booleanAssignment.
     def enterBooleanAssignment(self, ctx: ZenithGrammarParser.BooleanAssignmentContext):
-        print("bool assignment", ctx.getText(), ctx.getChildCount())
+        # print("bool assignment", ctx.getText(), ctx.getChildCount())
         variable_name = ctx.VARIABLE_IDENTIFIER().getText()
-        print("bool variable", variable_name)
+        # print("bool variable", variable_name)
         check = self.does_variable_exist(variable_name)
         declaration_code = f"{variable_name}"
         if check:
-            print("check", check)
+            # print("check", check)
             if self.type_list[variable_name] == 'boolean':
                 if ctx.bool_expr():
                     print("works??", ctx.bool_expr().getText())
@@ -290,7 +299,7 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#bool_expr.
     def enterBool_expr(self, ctx: ZenithGrammarParser.Bool_exprContext):
-        print("bool expr", ctx.getText())
+        # print("bool expr", ctx.getText())
         if ctx.VARIABLE_IDENTIFIER():
             variable_name = ctx.VARIABLE_IDENTIFIER().getText()
             # print(variable_name)
@@ -340,7 +349,7 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#bool_computation_expr.
     def enterBool_computation_expr(self, ctx: ZenithGrammarParser.Bool_computation_exprContext):
-        print("bool computation", ctx.getText(), ctx.getChildCount())
+        # print("bool computation", ctx.getText(), ctx.getChildCount())
         if ctx.bool_bracket_expr():
             return self.enterBool_bracket_expr(ctx.bool_bracket_expr())
 
@@ -348,7 +357,7 @@ class ZenithGrammarListener(ParseTreeListener):
 
             value1 = self.enterBool_computation_expr(ctx.bool_computation_expr(0))
             value2 = self.enterBool_computation_expr(ctx.bool_computation_expr(1))
-            print("check this", value1, " and ", value2)
+            # print("check this", value1, " and ", value2)
 
             if ctx.AND():
                 return value1 + " and " + value2
@@ -363,7 +372,7 @@ class ZenithGrammarListener(ParseTreeListener):
                 return value1 + " != " + value2
 
         elif ctx.comp_expr():
-            print("comes to evaluation")
+            # print("comes to evaluation")
             return self.enterNumberComparisonExpression(ctx.comp_expr())
 
     # Enter a parse tree produced by ZenithGrammarParser#bool_bracket_expr.
@@ -384,7 +393,7 @@ class ZenithGrammarListener(ParseTreeListener):
                 sys.exit()
 
         elif ctx.bool_expr():
-            print("bool expr", ctx.bool_expr().getText())
+            # print("bool expr", ctx.bool_expr().getText())
             return '(' + self.enterBool_expr(ctx.bool_expr()) + ')'
         pass
 
@@ -398,12 +407,12 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#numberComparisonExpression.
     def enterNumberComparisonExpression(self, ctx: ZenithGrammarParser.NumberComparisonExpressionContext):
-        print("content", ctx.getText(), ctx.getChildCount())
+        # print("content", ctx.getText(), ctx.getChildCount())
 
         value1 = self.enterNum_expr(ctx.num_expr(0))
         value2 = self.enterNum_expr(ctx.num_expr(1))
 
-        print("check", value1, " and ", value2)
+        # print("check", value1, " and ", value2)
 
         if ctx.LESS_THAN():
             return value1 + " < " + value2
@@ -421,7 +430,7 @@ class ZenithGrammarListener(ParseTreeListener):
             return value1 + " != " + value2
 
         elif ctx.IS_EQUL_TO():
-            print("check-equal", value1, " and ", value2)
+            # print("check-equal", value1, " and ", value2)
 
             return value1 + " == " + value2
 
@@ -546,16 +555,17 @@ class ZenithGrammarListener(ParseTreeListener):
         # Enter a parse tree produced by ZenithGrammarParser#if_expr.
     def enterIf_expr(self, ctx: ZenithGrammarParser.If_exprContext):
         i = 0
-        print("entered if", ctx.getText())
-        print("count", ctx.block().atomic_block(0).getChildCount())
+        # print("entered if", ctx.getText())
+        # print("count", ctx.block().atomic_block(0).getChildCount())
 
         value = f"if {self.enterCond_expr(ctx.cond_expr())}:"
         value += "\n{"
 
         self.intermediate_code.add_intermediate_output(value)
         self.indentOppCond()
-        print("list_check ---- ", self.indent_list)
+        # print("list_check ---- ", self.indent_list)
 
+        # print("This is exclusively from if", ctx.block().atomic_block(0).getText())
         self.indent_list.append(ctx.block().atomic_block(0).getChildCount())
         pass
 
@@ -566,15 +576,15 @@ class ZenithGrammarListener(ParseTreeListener):
     # Enter a parse tree produced by ZenithGrammarParser#else_if_expr.
     def enterElse_if_expr(self, ctx: ZenithGrammarParser.Else_if_exprContext):
         i = 0
-        print("entered elif", ctx.getText())
-        print("count", ctx.block().atomic_block(0).getChildCount())
+        # print("entered elif", ctx.getText())
+        # print("count", ctx.block().atomic_block(0).getChildCount())
 
         value = f"elif {self.enterCond_expr(ctx.cond_expr())}:"
         value += "\n{"
         
         self.intermediate_code.add_intermediate_output(value)
         self.indentOppCond()
-        print("list_check ---- ", self.indent_list)
+        # print("list_check ---- ", self.indent_list)
 
         self.indent_list.append(ctx.block().atomic_block(0).getChildCount())
         pass
@@ -587,8 +597,8 @@ class ZenithGrammarListener(ParseTreeListener):
     # Enter a parse tree produced by ZenithGrammarParser#else_expr.
     def enterElse_expr(self, ctx: ZenithGrammarParser.Else_exprContext):
         i = 0
-        print("entered elif", ctx.getText())
-        print("count", ctx.block().atomic_block(0).getChildCount())
+        # print("entered elif", ctx.getText())
+        # print("count", ctx.block().atomic_block(0).getChildCount())
 
         value = f"else:"
         value += "\n{"
@@ -597,7 +607,7 @@ class ZenithGrammarListener(ParseTreeListener):
         self.indentOppCond()
         self.indent_list.append(ctx.block().atomic_block(0).getChildCount())
 
-        print("list_check ---- ", self.indent_list)
+        # print("list_check ---- ", self.indent_list)
 
         pass
 
@@ -607,10 +617,10 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#while_expr.
     def enterWhile_expr(self, ctx: ZenithGrammarParser.While_exprContext):
-        print("entered while", ctx.getText())
+        # print("entered while", ctx.getText())
         value = f"while {self.enterCond_expr(ctx.cond_expr())}:"
         value += "\n{"
-        print("value", value)
+        # print("value", value)
         self.intermediate_code.add_intermediate_output(value)
         self.indentOppCond()
         self.indent_list.append(ctx.block().atomic_block(0).getChildCount())  
@@ -623,11 +633,11 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#for_enhanced.
     def enterFor_enhanced(self, ctx: ZenithGrammarParser.For_enhancedContext):
-        print("entered for", ctx.getText())
-        print("range", ctx.rangeVal()[0].getText())
+        # print("entered for", ctx.getText())
+        # print("range", ctx.rangeVal()[0].getText())
         value = f"for {ctx.VARIABLE_IDENTIFIER().getText()} in range({self.enterRangeVal(ctx.rangeVal()[0])}, {self.enterRangeVal(ctx.rangeVal()[1])}):"
         value += "\n{"
-        print("value", value)
+        # print("value", value)
         self.intermediate_code.add_intermediate_output(value)
         self.indentOppCond()
         self.indent_list.append(ctx.block().atomic_block(0).getChildCount())
@@ -656,25 +666,36 @@ class ZenithGrammarListener(ParseTreeListener):
     def exitRangeVal(self, ctx: ZenithGrammarParser.RangeValContext):
         pass
 
-    def get_value_after_equals(self, ctx):
-    # Get the assignment expression
-        assignment_expr = ctx.assignment_expr().getText()
+    # def get_value_after_equals(self, ctx):
+    # # Get the assignment expression
+    #     assignment_expr = ctx.assignment_expr().getText()
 
-        # Split the string on the "=" sign
-        _, value = assignment_expr.split("=")
+    #     # Split the string on the "=" sign
+    #     _, value = assignment_expr.split("#=")
 
-        # Remove leading and trailing whitespace and return the first character
-        return value.strip()[0]
+    #     # Remove leading and trailing whitespace and return the first character
+    #     return value.strip()[0]
+    
+    # def get_id_after_equals(self, ctx):
+    # # Get the assignment expression
+    #     assignment_expr = ctx.assignment_expr().getText()
+
+    #     # Split the string on the "=" sign
+    #     id, _ = assignment_expr.split("#=")
+
+    #     # Remove leading and trailing whitespace and return the first character
+    #     return id.strip()[0]
     
     def get_value_after_operator(self, ctx):
     # Get the boolean expression
         bool_expr = ctx.bool_expr().getText()
 
         # Split the string on the space character
-        _, value = bool_expr.split("<")
+        _, value = re.split("<=|>=|<|>", bool_expr)
+        # print("value", value)
 
         # Return the value converted to an integer
-        return int(value)
+        return value
     
     def get_operator_and_value(self, ctx):
     # Get the variable change expression
@@ -699,12 +720,19 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#for_loop.
     def enterFor_loop(self, ctx: ZenithGrammarParser.For_loopContext):
-        print("entered for", ctx.getText())
-        value = f"for c in range({self.get_value_after_equals(ctx)},{self.get_value_after_operator(ctx)},{self.get_operator_and_value(ctx)}):"
+        # print("entered for", ctx.getText())
+        # print("id value inside for", self.get_id_after_equals(ctx))
+        # print("ctx bool", ctx.bool_expr().getText())
+        value = f"{ctx.VARIABLE_IDENTIFIER().getText()} = {ctx.DIGITS()} \nfor {ctx.VARIABLE_IDENTIFIER().getText()} in range({ctx.DIGITS()},{self.get_value_after_operator(ctx)},{self.get_operator_and_value(ctx)}):"
         value += "\n{"
-        print("value", value)
+        # print("value for loop shit", value)
         self.intermediate_code.add_intermediate_output(value)
         self.indentOppCond()
+        # print("This is exclusively from for", ctx.block().getChild(0).getText())
+        # print("This is exclusively from for", ctx.block().getChild(1).getText())
+        # print("This is exclusively from for", ctx.block().getChild(2).getText())
+        # print("This is exclusively from for", ctx.block().getChild(3).getText())
+        # print("This is exclusively from for", ctx.block().atomic_block(0).getChild(0).getText())
         self.indent_list.append(ctx.block().atomic_block(0).getChildCount())
         pass
 
@@ -738,9 +766,28 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#ternary_expr.
     def enterTernary_expr(self, ctx: ZenithGrammarParser.Ternary_exprContext):
-        # print("ternary", ctx.getText())
+        print("ternary", ctx.getText())
         # print("exprs in ternary", ctx.exprs(0).getText())
-        value = f"{self.enterExprs(ctx.exprs(0))} if {self.enterCond_expr(ctx.cond_expr())} else {self.enterExprs(ctx.exprs(1))}"
+        value = ""
+        if ctx.exprs(0):
+            value = f"{self.enterExprs(ctx.exprs(0))} if {self.enterCond_expr(ctx.cond_expr())} else {self.enterExprs(ctx.exprs(1))}"
+        elif ctx.BOOLEAN(0):
+            if ctx.BOOLEAN(0).getText() == "false":
+                if ctx.BOOLEAN(1).getText() == "false":
+                    value = f"False if {self.enterCond_expr(ctx.cond_expr())} else False"
+                else:
+                    value = f"False if {self.enterCond_expr(ctx.cond_expr())} else True"
+            else:
+                if ctx.BOOLEAN(1).getText() == "false":
+                    value = f"True if {self.enterCond_expr(ctx.cond_expr())} else False"
+                else:
+                    value = f"True if {self.enterCond_expr(ctx.cond_expr())} else True"
+            print("value", value)
+        else:
+            print("valid string", ctx.VALID_STRING(0))
+            value = f"{(ctx.VALID_STRING(0))} if {self.enterCond_expr(ctx.cond_expr())} else {(ctx.VALID_STRING(1))}"
+            print("value", value)
+        # value = f"{self.enterExprs(ctx.exprs(0))} if {self.enterCond_expr(ctx.cond_expr())} else {self.enterExprs(ctx.exprs(1))}"
         # print("value", value)
         return value
         # self.intermediate_code.add_intermediate_output(value)
@@ -760,18 +807,19 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#print.
     def enterPrint(self, ctx: ZenithGrammarParser.PrintContext):
-        print("print", ctx.getText())
-        print("print parameters length", ctx.getChild(2).getText())
+        # print("print", ctx.getText())
+        # print("print parameters length", ctx.getChild(2).getText())
         value = f"print({ctx.getChild(2).getText()}"
-        print("from child",value)
+        # print("from child",value)
         # value = ""
         i = 3
         while i < ctx.getChildCount() - 1:
             value += f"{ctx.getChild(i).getText()}"
             i += 1
         value += ")"
-        print("value", value)
+        # print("value from print", value)
         self.intermediate_code.add_intermediate_output(value)
+        self.indentOpp()
         pass
 
     # Exit a parse tree produced by ZenithGrammarParser#print.
