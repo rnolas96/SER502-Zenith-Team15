@@ -766,7 +766,7 @@ class ZenithGrammarListener(ParseTreeListener):
 
     # Enter a parse tree produced by ZenithGrammarParser#ternary_expr.
     def enterTernary_expr(self, ctx: ZenithGrammarParser.Ternary_exprContext):
-        print("ternary", ctx.getText())
+        # print("ternary", ctx.getText())
         # print("exprs in ternary", ctx.exprs(0).getText())
         value = ""
         if ctx.exprs(0):
@@ -782,11 +782,11 @@ class ZenithGrammarListener(ParseTreeListener):
                     value = f"True if {self.enterCond_expr(ctx.cond_expr())} else False"
                 else:
                     value = f"True if {self.enterCond_expr(ctx.cond_expr())} else True"
-            print("value", value)
+            # print("value", value)
         else:
-            print("valid string", ctx.VALID_STRING(0))
+            # print("valid string", ctx.VALID_STRING(0))
             value = f"{(ctx.VALID_STRING(0))} if {self.enterCond_expr(ctx.cond_expr())} else {(ctx.VALID_STRING(1))}"
-            print("value", value)
+            # print("value", value)
         # value = f"{self.enterExprs(ctx.exprs(0))} if {self.enterCond_expr(ctx.cond_expr())} else {self.enterExprs(ctx.exprs(1))}"
         # print("value", value)
         return value
